@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 
-import packageService from './services/packages'
-
 import Breadcrumbs from './components/Breadcrumbs'
 import ListView from './components/list/ListView'
 import DetailsView from './components/details/DetailsView'
 
 import './App.css'
 
-const App = () => {
+const App = ({ packageService }) => {
   const [page, setPage] = useState('packages')
 
   const selectContent = () => {
