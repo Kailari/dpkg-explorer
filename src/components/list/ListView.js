@@ -9,7 +9,7 @@ const ListView = ({ changePage, packages }) => {
     <p>
       Click on package titles to get more information of each package.
         </p>
-    <PackageList packages={packages} onClickPackage={pkgURL => changePage(pkgURL)} />
+    <PackageList packages={packages} onClickPackage={changePage} />
   </>
 }
 
@@ -26,9 +26,12 @@ const PackageList = ({ packages, onClickPackage }) => {
 }
 
 const PackageLink = ({ pkg, onClickPackage }) => {
-  const pkgURL = `packages/${pkg.id}`
+  const handleClick = (event) => {
+    event.preventDefault()
+    onClickPackage(`packages/${pkg.id}`)
+  }
 
-  return <a href="/" onClick={onClickPackage(pkgURL)}>
+  return <a href="/" onClick={handleClick} className='package-link'>
     {pkg.Package}
   </a>
 }

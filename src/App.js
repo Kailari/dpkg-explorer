@@ -10,18 +10,18 @@ import './App.css'
 const App = () => {
   const [page, setPage] = useState('packages')
 
-  const changePage = (page) => (event) => {
-    event.preventDefault()
-    setPage(page)
-  }
-
   const nav = () => {
+    const navLinkClickHandler = page => event => {
+      event.preventDefault()
+      setPage(page)
+    }
+
     const paths = page.split('/')
     const fullPaths = paths.map((p, index) => paths.slice(0, index + 1).join('/'))
 
     const currentPath = paths.map((p, index) =>
       <React.Fragment key={p}>
-        <a href="/" onClick={changePage(fullPaths[index])}>
+        <a href="/" onClick={navLinkClickHandler(fullPaths[index])}>
           {p}
         </a>
         <span style={{ userSelect: 'none' }}>/</span>
@@ -36,11 +36,11 @@ const App = () => {
     if (page.startsWith('packages/')) {
       const packageId = page.substring(9)
       const pkg = packageService.findById(packageId)
-      return <DetailsView changePage={changePage} package={pkg} />
+      return <DetailsView changePage={setPage} package={pkg} />
     }
 
     const packages = packageService.getAll()
-    return <ListView changePage={changePage} packages={packages} />
+    return <ListView changePage={setPage} packages={packages} />
   }
 
   return (

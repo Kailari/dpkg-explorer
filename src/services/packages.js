@@ -46,7 +46,11 @@ const packages = [
   {
     id: 2,
     Package: "aaa"
-  }
+  },
+  {
+    id: 3,
+    Package: "libtext-wrapi18n-perl"
+  },
 ]
 
 const getAll = () => {
