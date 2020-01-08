@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import packageService from './services/packages'
 
+import Breadcrumbs from './components/Breadcrumbs'
 import ListView from './components/list/ListView'
 import DetailsView from './components/details/DetailsView'
 
@@ -9,28 +10,6 @@ import './App.css'
 
 const App = () => {
   const [page, setPage] = useState('packages')
-
-  const nav = () => {
-    const navLinkClickHandler = page => event => {
-      event.preventDefault()
-      setPage(page)
-    }
-
-    const paths = page.split('/')
-    const fullPaths = paths.map((p, index) => paths.slice(0, index + 1).join('/'))
-
-    const currentPath = paths.map((p, index) =>
-      <React.Fragment key={p}>
-        <a href="/" onClick={navLinkClickHandler(fullPaths[index])}>
-          {p}
-        </a>
-        <span style={{ userSelect: 'none' }}>/</span>
-      </React.Fragment>
-    )
-    return <span>
-      home/{currentPath}
-    </span>
-  }
 
   const selectContent = () => {
     if (page.startsWith('packages/')) {
@@ -48,7 +27,7 @@ const App = () => {
       <header>
         <h1>DPKG-Explorer</h1>
         <nav>
-          {nav()}
+          <Breadcrumbs page={page} changePage={setPage} />
         </nav>
       </header>
       <section className='content-container'>

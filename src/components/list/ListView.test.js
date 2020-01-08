@@ -1,6 +1,6 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import ListView from './ListView';
+import React from 'react'
+import { render, fireEvent } from '@testing-library/react'
+import ListView from './ListView'
 
 const createTestPackages = () => [
   {
