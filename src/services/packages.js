@@ -1,6 +1,6 @@
 const packages = [
   {
-    id: 0,
+    id: "0",
     Package: "libws-commons-util-java",
     Status: "install ok installed",
     Priority: "optional",
@@ -16,7 +16,7 @@ const packages = [
     Homepage: "http://ws.apache.org/commons/util/"
   },
   {
-    id: 1,
+    id: "1",
     Package: "python-pkg-resources",
     Status: "install ok installed",
     Priority: "optional",
@@ -44,11 +44,11 @@ const packages = [
     PythonVersion: "2.6, 2.7"
   },
   {
-    id: 2,
+    id: "2",
     Package: "aaa"
   },
   {
-    id: 3,
+    id: "3",
     Package: "libtext-wrapi18n-perl"
   },
 ]
@@ -58,7 +58,7 @@ const getAll = () => {
 }
 
 const findById = id => {
-  return packages.find(pkg => pkg.id === id)
+  return packages.find(({ id: pkgId }) => id === pkgId)
 }
 
 export default {
