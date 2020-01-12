@@ -20,7 +20,7 @@ const testPkg = {
   Description: `Package Discovery and Resource Access using pkg_resources
 The pkg_resources module provides an API for Python libraries to
 access their resource files, and for extensible applications and
-frameworks to automatically discover plugins.  It also provides
+frameworks to automatically discover plugins. It also provides
 runtime support for using C extensions that are inside zipfile-format
 eggs, support for merging packages that have separately-distributed
 modules or subpackages, and APIs for managing Python's current
@@ -42,8 +42,12 @@ test('package description is rendered', () => {
   const mockChangePage = jest.fn()
 
   const { getByText } = render(<DetailsView changePage={mockChangePage} pkg={testPkg} />)
-  const element = getByText(testPkg.Description)
-  expect(element).toBeInTheDocument()
+  testPkg.Description
+    .split('\n')
+    .forEach(line => {
+      const element = getByText(line)
+      expect(element).toBeInTheDocument()
+    })
 })
 
 test('package dependencies are rendered', () => {

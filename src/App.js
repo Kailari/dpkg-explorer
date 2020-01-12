@@ -13,7 +13,6 @@ const App = ({ packageService }) => {
     if (page.startsWith('packages/')) {
       const packageId = page.substring(9)
       const pkg = packageService.findById(packageId)
-      console.log("pkg:", pkg)
       return <DetailsView changePage={setPage} pkg={pkg} />
     }
 
