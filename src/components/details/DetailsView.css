@@ -5,3 +5,7 @@
 .package-details .depends {
     font-family: monospace;
 }
+
+.package-details .dependents {
+    font-family: monospace;
+}

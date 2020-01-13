@@ -20,6 +20,18 @@ export const parsePackages = data => {
  * @param {Object[]} packages 
  */
 export const populateReverseDependencies = packages => {
+  packages.forEach(pkg => {
+    (pkg.Depends || [])
+      .map(dependencyName => dependencyName
+        .split('|')
+        .map(string => string.trim()))
+      .flatMap(dependencyNames => dependencyNames.map(dependencyName => packages.find(p => p.Package === dependencyName)))
+      .filter(dependency => dependency !== null && dependency !== undefined)
+      .forEach(dependency => dependency.Dependents =
+        dependency.Dependents !== undefined
+          ? [...dependency.Dependents, pkg.Package]
+          : [pkg.Package])
+  })
   return packages
 }
 
@@ -79,12 +91,17 @@ const parseDependencies = dependencyString => {
     .filter(onlyUnique)
 }
 
-const removeVersionFromDependencyString = dependency => {
-  let bracketIndex = dependency.indexOf('(')
-  let endIndex = bracketIndex > -1 ? bracketIndex : dependency.length
-  return dependency
-    .substring(0, endIndex)
-    .trim()
+const removeVersionFromDependencyString = dependencyGroup => {
+  return dependencyGroup
+    .split('|')
+    .map(dependency => {
+      let bracketIndex = dependency.indexOf('(')
+      let endIndex = bracketIndex > -1 ? bracketIndex : dependency.length
+      return dependency
+        .substring(0, endIndex)
+        .trim()
+    })
+    .join(' | ')
 }
 
 const onlyUnique = (value, index, self) => self.indexOf(value) === index

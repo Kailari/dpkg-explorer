@@ -18,6 +18,12 @@ const DetailsView = ({ changePage, pkg }) => {
       {(pkg.Depends || ['No dependencies'])
         .map((dependency, index) => <li key={index}>{dependency}</li>)}
     </ul>
+
+    <h4>Dependents</h4>
+    <ul className='dependents'>
+      {(pkg.Dependents || ['No dependent packages'])
+        .map((reverseDependency, index) => <li key={index}>{reverseDependency}</li>)}
+    </ul>
   </div>
 }
 

@@ -1,7 +1,7 @@
-import { parsePackages } from "./package_parser"
+import { parsePackages, populateReverseDependencies } from "./package_parser"
 
-const inputSinglePackage = 
-`Package: libws-commons-util-java
+const inputSinglePackage =
+  `Package: libws-commons-util-java
 Status: install ok installed
 Priority: optional
 Section: java
@@ -16,7 +16,7 @@ Original-Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.
 Homepage: http://ws.apache.org/commons/util/`
 
 const inputMultiplePackages =
-`Package: libws-commons-util-java
+  `Package: libws-commons-util-java
 Status: install ok installed
 Priority: optional
 Section: java
@@ -81,7 +81,7 @@ Description: Wietse Venema's TCP wrapper utilities
 Original-Maintainer: Marco d'Itri <md@linux.it>`
 
 const inputWithCopmplexDescription =
-`Package: adduser
+  `Package: adduser
 Status: install ok installed
 Multi-Arch: foreign
 Priority: required
@@ -120,6 +120,84 @@ Description: add and remove users and groups
 Homepage: http://alioth.debian.org/projects/adduser/
 Original-Maintainer: Debian Adduser Developers <adduser-devel@lists.alioth.debian.org>`
 
+const inputWithOptionalDeps =
+  `Package: grep
+Essential: yes
+Status: install ok installed
+Priority: required
+Section: utils
+Installed-Size: 608
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Architecture: amd64
+Version: 2.10-1
+Provides: rgrep
+Depends: dpkg (>= 1.15.4) | install-info
+Pre-Depends: libc6 (>= 2.4)
+Suggests: libpcre3 (>= 7.7)
+Conflicts: rgrep
+Description: GNU grep, egrep and fgrep
+ 'grep' is a utility to search for text in files; it can be used from the
+ command line or in scripts.  Even if you don't want to use it, other packages
+ on your system probably will.
+ .
+ The GNU family of grep utilities may be the "fastest grep in the west".
+ GNU grep is based on a fast lazy-state deterministic matcher (about
+ twice as fast as stock Unix egrep) hybridized with a Boyer-Moore-Gosper
+ search for a fixed string that eliminates impossible text from being
+ considered by the full regexp matcher without necessarily having to
+ look at every character. The result is typically many times faster
+ than Unix grep or egrep. (Regular expressions containing backreferencing
+ will run more slowly, however.)
+Original-Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
+Homepage: http://www.gnu.org/software/grep/
+
+Package: install-info
+Status: install ok installed
+Multi-Arch: foreign
+Priority: important
+Section: doc
+Installed-Size: 218
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Architecture: amd64
+Source: texinfo
+Version: 4.13a.dfsg.1-8ubuntu2
+Replaces: texinfo (<< 4.13a.dfsg.1-2)
+Depends: libc6 (>= 2.14)
+Breaks: texinfo (<< 4.13a.dfsg.1-2)
+Description: Manage installed documentation in info format
+ The install-info utility creates the index of all installed documentation
+ in info format and makes it available to info readers.
+Original-Maintainer: Debian TeX maintainers <debian-tex-maint@lists.debian.org>
+
+Package: dpkg
+Essential: yes
+Status: install ok installed
+Multi-Arch: foreign
+Priority: required
+Section: admin
+Installed-Size: 5931
+Origin: debian
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Bugs: debbugs://bugs.debian.org
+Architecture: amd64
+Version: 1.16.1.2ubuntu7
+Pre-Depends: libbz2-1.0, libc6 (>= 2.14), libselinux1 (>= 1.32), zlib1g (>= 1:1.1.4), coreutils (>= 5.93-1), tar (>= 1.23), xz-utils
+Suggests: apt
+Breaks: apt (<< 0.7.7), aptitude (<< 0.4.7-1), dpkg-dev (<< 1.15.8), libdpkg-perl (<< 1.15.8), pinfo (<< 0.6.9-3.1), tkinfo (<< 2.8-3.1)
+Conffiles:
+ /etc/dpkg/dpkg.cfg f4413ffb515f8f753624ae3bb365b81b
+ /etc/dpkg/dpkg.cfg.d/multiarch e018c53338191b34f943e2b38e160d1a
+ /etc/logrotate.d/dpkg 782ea5ae536f67ff51dc8c3e2eeb4cf9
+ /etc/alternatives/README 69c4ba7f08363e998e0f2e244a04f881
+ /etc/cron.daily/dpkg b6b8dc21210ea50db7cc4636f521758f
+Description: Debian package management system
+ This package provides the low-level infrastructure for handling the
+ installation and removal of Debian software packages.
+ .
+ For Debian package development tools, install dpkg-dev.
+Homepage: http://wiki.debian.org/Teams/Dpkg
+Original-Maintainer: Dpkg Developers <debian-dpkg@lists.debian.org>`
+
 test('parsed package has some of the expected properties', () => {
   const input = inputSinglePackage
   const parsed = parsePackages(input)
@@ -135,8 +213,8 @@ test('multiline field is concatenated into a single string', () => {
 
   expect(parsed[0].Description).toBeDefined()
   expect(parsed[0].Description).toBe('Common utilities from the Apache Web Services Project\n' +
-  'This is a small collection of utility classes, that allow high\n' +
-  'performance XML processing based on SAX.')
+    'This is a small collection of utility classes, that allow high\n' +
+    'performance XML processing based on SAX.')
 })
 
 test('multiple packages are succesfully parsed', () => {
@@ -160,8 +238,22 @@ test('periods in multiline strings are outupt as empty lines', () => {
 
 test('package dependency versions are removed from dependencies', () => {
   const input = inputWithCopmplexDescription
-  const parsed = parsePackages(input)
+  const parsed = populateReverseDependencies(parsePackages(input))
 
   expect(parsed[0].Depends).toBeDefined()
   expect(parsed[0].Depends).toEqual(['perl-base', 'passwd', 'debconf | debconf-2.0'])
+})
+
+test('reverse dependencies are populated', () => {
+  const input = inputWithOptionalDeps
+  const parsed = populateReverseDependencies(parsePackages(input))
+
+  const dpkg = parsed.find(pkg => pkg.Package === 'dpkg')
+  const iinfo = parsed.find(pkg => pkg.Package === 'install-info')
+
+  expect(dpkg.Dependents).toBeDefined()
+  expect(dpkg.Dependents).toEqual(['grep'])
+  
+  expect(iinfo.Dependents).toBeDefined()
+  expect(iinfo.Dependents).toEqual(['grep'])
 })
