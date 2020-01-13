@@ -2,7 +2,7 @@ import React from 'react'
 import { render, wait } from '@testing-library/react'
 import App from './App'
 
-const createTestPackageService = () => {
+export const createTestPackageService = () => {
   const packages = [
     {
       id: 1,
@@ -23,11 +23,13 @@ const createTestPackageService = () => {
   const getAll = () => packages.concat()
 
   const findById = id => packages.concat().find(pkg => pkg.id === id)
+  const findByName = name => packages.concat().find(pkg => pkg.Package === name)
 
   return {
     fetch,
     getAll,
-    findById
+    findById,
+    findByName,
   }
 }
 

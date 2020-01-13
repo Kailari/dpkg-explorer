@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import DetailsView from './DetailsView'
+import { createTestPackageService } from '../../App.test'
 
 const testPkg = {
   Package: "python-pkg-resources",
@@ -33,7 +34,7 @@ modules or subpackages, and APIs for managing Python's current
 test('package name is rendered', () => {
   const mockChangePage = jest.fn()
 
-  const { getByText } = render(<DetailsView changePage={mockChangePage} pkg={testPkg} />)
+  const { getByText } = render(<DetailsView changePage={mockChangePage} packageService={createTestPackageService()} pkg={testPkg} />)
   const element = getByText(testPkg.Package)
   expect(element).toBeInTheDocument()
 })
@@ -41,7 +42,7 @@ test('package name is rendered', () => {
 test('package description is rendered', () => {
   const mockChangePage = jest.fn()
 
-  const { getByText } = render(<DetailsView changePage={mockChangePage} pkg={testPkg} />)
+  const { getByText } = render(<DetailsView changePage={mockChangePage} packageService={createTestPackageService()} pkg={testPkg} />)
   testPkg.Description
     .split('\n')
     .forEach(line => {
@@ -53,7 +54,7 @@ test('package description is rendered', () => {
 test('package dependencies are rendered', () => {
   const mockChangePage = jest.fn()
 
-  const { getByText } = render(<DetailsView changePage={mockChangePage} pkg={testPkg} />)
+  const { getByText } = render(<DetailsView changePage={mockChangePage} packageService={createTestPackageService()} pkg={testPkg} />)
   const firstElement = getByText("someDep")
   const secondElement = getByText("someAnotherDep")
   expect(firstElement).toBeInTheDocument()

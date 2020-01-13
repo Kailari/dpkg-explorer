@@ -8,7 +8,6 @@ const fetch = async onFinished => {
     const serverPackages = await axios.get(`${process.env.PUBLIC_URL}/dpkg/status`)
     const parsed = parsePackages(serverPackages.data)
     const populated = populateReverseDependencies(parsed)
-    console.log(populated)
     packages = populated
   } catch (e) {
     console.error(e)
@@ -24,9 +23,14 @@ const findById = id => {
   return packages.find(({ id: pkgId }) => id === pkgId)
 }
 
+const findByName = name => {
+  return packages.find(({ Package: pkgName }) => name === pkgName)
+}
+
 export default {
   fetch,
   getAll,
-  findById
+  findById,
+  findByName
 }
 
