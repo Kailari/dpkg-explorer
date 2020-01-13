@@ -1,13 +1,15 @@
 import axios from 'axios'
 
-import { parsePackages } from '../util/package_parser'
+import { parsePackages, populateReverseDependencies } from '../util/package_parser'
 
 let packages = []
 const fetch = async onFinished => {
   try {
     const serverPackages = await axios.get(`${process.env.PUBLIC_URL}/dpkg/status`)
     const parsed = parsePackages(serverPackages.data)
-    packages = parsed
+    const populated = populateReverseDependencies(parsed)
+    console.log(populated)
+    packages = populated
   } catch (e) {
     console.error(e)
   }

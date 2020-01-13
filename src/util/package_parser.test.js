@@ -157,3 +157,11 @@ test('periods in multiline strings are outupt as empty lines', () => {
   expect(description[3]).not.toBe('.')
   expect(description[3]).toBe('')
 })
+
+test('package dependency versions are removed from dependencies', () => {
+  const input = inputWithCopmplexDescription
+  const parsed = parsePackages(input)
+
+  expect(parsed[0].Depends).toBeDefined()
+  expect(parsed[0].Depends).toEqual(['perl-base', 'passwd', 'debconf | debconf-2.0'])
+})

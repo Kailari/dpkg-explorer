@@ -3,16 +3,6 @@ import React from 'react'
 import './DetailsView.css'
 
 const DetailsView = ({ changePage, pkg }) => {
-  const removeVersionFromDependencyString = dependency => {
-    let bracketIndex = dependency.indexOf('(')
-    let endIndex = bracketIndex > -1 ? bracketIndex : dependency.length
-    return dependency
-      .substring(0, endIndex)
-      .trim()
-  }
-
-  const onlyUnique = (value, index, self) => self.indexOf(value) === index
-
   return <div className='package-details'>
     <h2>{pkg.Package}</h2>
     <p className='description'>
@@ -25,10 +15,7 @@ const DetailsView = ({ changePage, pkg }) => {
 
     <h4>Dependencies</h4>
     <ul className='depends'>
-      {(pkg.Depends || 'No dependencies')
-        .split(',')
-        .map(removeVersionFromDependencyString)
-        .filter(onlyUnique)
+      {(pkg.Depends || ['No dependencies'])
         .map((dependency, index) => <li key={index}>{dependency}</li>)}
     </ul>
   </div>
