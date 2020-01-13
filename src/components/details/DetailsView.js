@@ -15,7 +15,6 @@ const DetailsView = ({ changePage, pkg }) => {
 
   return <div className='package-details'>
     <h2>{pkg.Package}</h2>
-    <h3>Description</h3>
     <p className='description'>
       {(pkg.Description || 'Description not available.')
         .split('\n')

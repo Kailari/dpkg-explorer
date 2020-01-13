@@ -1,4 +1,6 @@
-const packages = [
+import axios from 'axios'
+
+const fallbackPackages = [
   {
     id: "0",
     Package: "libws-commons-util-java",
@@ -53,6 +55,48 @@ const packages = [
   },
 ]
 
+let packages = fallbackPackages
+const fetch = async onFinished => {
+  try {
+    const serverPackages = await axios.get(`${process.env.PUBLIC_URL}/dpkg/status`)
+    const parsed = parsePackages(serverPackages.data)
+    console.log(parsed)
+    packages = parsed
+  } catch (e) {
+    console.error(e)
+  }
+  onFinished()
+}
+
+const parsePackages = data => {
+  const packagesAsStrings = data.split(/\n\s*\n/gm)
+  const packagesSplit = packagesAsStrings
+    .map(string => string.split(/\n/))
+    .map(propertyStrings => propertyStrings
+      .reduce((accumulator, property) => {
+        if (property.match(/^\s/g)) {
+          var indexOfLast = accumulator.length - 1
+          accumulator[indexOfLast] = accumulator[indexOfLast].concat(property.trim())
+        } else {
+          accumulator.push(property)
+        }
+
+        return accumulator
+      }, [])
+      .map(propertyString => [
+        propertyString.substring(0, propertyString.indexOf(':')).trim(),
+        propertyString.substring(propertyString.indexOf(':') + 1).trim()
+      ]))
+    .reduce((accumulator, propertyStrings, index) => {
+      var pkg = {}
+      pkg.id = `${index}`
+      propertyStrings.forEach(propertyString => pkg[propertyString[0].replace('-', '')] = propertyString[1])
+      accumulator.push(pkg)
+      return accumulator
+    }, [])
+  return packagesSplit
+}
+
 const getAll = () => {
   return packages;
 }
@@ -62,6 +106,7 @@ const findById = id => {
 }
 
 export default {
+  fetch,
   getAll,
   findById
 }
